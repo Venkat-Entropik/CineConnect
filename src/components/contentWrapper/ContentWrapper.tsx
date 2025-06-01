@@ -7,7 +7,11 @@ interface ContentWrapperProps {
 }
 
 const ContentWrapper: FC<ContentWrapperProps> = ({ children }) => {
-  return <div className="contentWrapper">{children}</div>;
+  return (
+    <div className="contentWrapper" data-testid="content-wrapper">
+      {children}
+    </div>
+  );
 };
 
 export default ContentWrapper;
