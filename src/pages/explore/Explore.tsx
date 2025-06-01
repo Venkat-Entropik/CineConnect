@@ -12,20 +12,21 @@ import Spinner from "../../components/spinner/Spinner";
 
 import { sortbyData } from "../../utils/Static";
 import Dropdown from "../../design/Atoms/Dropdown/Dropdown";
+import { ExploreDataProps, genreProps, selectedSortByActionProps, sortByProps } from "../../types/Explore";
 
 let filters = {};
 
 const Explore = () => {
-  const [data, setData] = useState(null);
-  const [pageNum, setPageNum] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [genre, setGenre] = useState(null);
-  const [sortby, setSortby] = useState(null);
+  const [data, setData] = useState<ExploreDataProps | null>(null);
+  const [pageNum, setPageNum] = useState<number>(1);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [genre, setGenre] = useState<genreProps[] | null>(null);
+  const [sortby, setSortby] = useState<sortByProps | null>(null);
   const { mediaType } = useParams();
 
   const { data: genresData } = useFetch(`/genre/${mediaType}/list`);
 
-  const fetchInitialData = () => {
+  const fetchInitialData = (): void => {
     setLoading(true);
     fetchDataFromApi(`/discover/${mediaType}`, filters).then(res => {
       setData(res);
@@ -34,7 +35,9 @@ const Explore = () => {
     });
   };
 
-  const fetchNextPageData = () => {
+  console.log("data", data, genre, sortby);
+
+  const fetchNextPageData = (): void => {
     fetchDataFromApi(`/discover/${mediaType}?page=${pageNum}`, filters).then(res => {
       if (data && data.results) {
         setData({
@@ -57,7 +60,8 @@ const Explore = () => {
     fetchInitialData();
   }, [mediaType]);
 
-  const onChange = (selectedItems, action) => {
+  const onChange = (selectedItems: sortByProps, action: selectedSortByActionProps): void => {
+    console.log("selected", selectedItems, action)
     if (action.name === "sortby") {
       setSortby(selectedItems);
       if (action.action !== "clear") {

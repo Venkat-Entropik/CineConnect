@@ -28,9 +28,9 @@ const HeroBanner: FC = () => {
   };
 
   return (
-    <div className="heroBanner">
+    <div className="heroBanner" data-testid="heroBanner">
       {!loading && (
-        <div className="backdrop-img">
+        <div className="backdrop-img" data-testid="backdrop-img">
           <Img src={background} />
         </div>
       )}

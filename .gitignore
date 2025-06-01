@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 
 .env
+
+coverage/
+coverage-final.json
+.nyc_output
