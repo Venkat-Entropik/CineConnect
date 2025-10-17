@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { fetchDataFromApi } from "../utils/interceptor";
-const useFetch = (url) => {
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(null);
-    const [error, setError] = useState(null);
+
+const useFetch = (url: string) => {
+    const [data, setData] = useState<any>(null);
+    const [loading, setLoading] = useState<boolean | null | string>(null);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         setLoading("loading...");
@@ -15,7 +16,7 @@ const useFetch = (url) => {
                 setLoading(false);
                 setData(res);
             })
-            .catch((err) => {
+            .catch(() => {
                 setLoading(false);
                 setError("Something went wrong!");
             });

@@ -1,6 +1,5 @@
 import React, { FC } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
 
 import "./style.scss";
 import Img from "../lazyLoadImage/Img";
@@ -9,6 +8,7 @@ import Genres from "../genres/Genres";
 import PosterFallback from "../../assets/no-poster.png";
 import { getDateFormat } from "../../utils/utilityService";
 import { dataProps } from "../../types/data";
+import { useAppSelector } from "../../hooks/useAppSelector";
 
 interface MovieCardProps {
   data: dataProps;
@@ -17,7 +17,7 @@ interface MovieCardProps {
 }
 
 const MovieCard: FC<MovieCardProps> = ({ data, fromSearch, mediaType }) => {
-  const { url } = useSelector(state => state.home);
+  const { url } = useAppSelector(state => state.home);
   const navigate = useNavigate();
   const posterUrl = data.poster_path ? url.poster + data.poster_path : PosterFallback;
   return (

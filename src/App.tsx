@@ -48,9 +48,9 @@ const App: FC = () => {
   };
 
   const genresCall = async () => {
-    let promises: Promise<any>[] = [];
-    let endPoints: string[] = ["tv", "movie"];
-    let allGenres: { [key: number]: Genre } = {};
+    const promises: Promise<unknown>[] = [];
+    const endPoints: string[] = ["tv", "movie"];
+    const allGenres: { [key: number]: Genre } = {};
 
     endPoints.forEach((url) => {
       promises.push(fetchDataFromApi(`/genre/${url}/list`));

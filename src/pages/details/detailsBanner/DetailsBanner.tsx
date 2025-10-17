@@ -1,21 +1,24 @@
-import React, { useState } from "react";
+import React, { FC, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
 
 import "./style.scss";
 
-import ContentWrapper from "../../../components/contentWrapper/ContentWrapper";
-import useFetch from "../../../hooks/useFetch";
-import Genres from "../../../components/genres/Genres";
-import CircleRating from "../../../components/circleRating/CircleRating";
+import ContentWrapper from "../../../components/contentWrapper/ContentWrapper.tsx";
+import useFetch from "../../../hooks/useFetch.jsx";
+import Genres from "../../../components/genres/Genres.jsx";
+import CircleRating from "../../../components/circleRating/CircleRating.tsx";
 import Img from "../../../components/lazyLoadImage/Img.jsx";
 import PosterFallback from "../../../assets/no-poster.png";
-import { PlayIcon } from "../Playbtn";
-import VideoPopup from "../../../components/videoPopup/VideoPopup";
+import { PlayIcon } from "../Playbtn.jsx";
+import VideoPopup from "../../../components/videoPopup/VideoPopup.jsx";
 import { getDateFormat } from "../../../utils/utilityService.ts";
+import { useAppSelector } from "../../../hooks/useAppSelector.tsx";
 
+interface DetailsBannerProps {
 
-const DetailsBanner = ({ video, crew }) => {
+}
+
+const DetailsBanner:FC<DetailsBannerProps> = ({ video, crew }) => {
   console.log("video", video, crew)
   const [show, setShow] = useState(false);
   const [videoId, setVideoId] = useState(null);
@@ -23,7 +26,7 @@ const DetailsBanner = ({ video, crew }) => {
   const { mediaType, id } = useParams();
   const { data, loading } = useFetch(`/${mediaType}/${id}`);
 
-  const { url } = useSelector(state => state.home);
+  const { url } = useAppSelector(state => state.home);
 
   const _genres = data?.genres?.map(g => g.id);
 

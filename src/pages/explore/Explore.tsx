@@ -12,7 +12,13 @@ import Spinner from "../../components/spinner/Spinner";
 
 import { sortbyData } from "../../utils/Static";
 import Dropdown from "../../design/Atoms/Dropdown/Dropdown";
-import { ExploreDataProps, genreProps, selectedSortByActionProps, sortByProps } from "../../types/Explore";
+import {
+  ExploreDataProps,
+  genreProps,
+  selectedSortByActionProps,
+  sortByProps,
+} from "../../types/Explore";
+import EmptyState from "../EmptyState/EmptyState";
 
 let filters = {};
 
@@ -61,7 +67,7 @@ const Explore = () => {
   }, [mediaType]);
 
   const onChange = (selectedItems: sortByProps, action: selectedSortByActionProps): void => {
-    console.log("selected", selectedItems, action)
+    console.log("selected", selectedItems, action);
     if (action.name === "sortby") {
       setSortby(selectedItems);
       if (action.action !== "clear") {
@@ -136,7 +142,7 @@ const Explore = () => {
                 })}
               </InfiniteScroll>
             ) : (
-              <span className="resultNotFound">Sorry, Results not found!</span>
+              <EmptyState title="Sorry, Results not found!" description="" height="100%" />
             )}
           </>
         )}
