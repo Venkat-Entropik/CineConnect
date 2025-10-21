@@ -1,28 +1,52 @@
-import { useEffect, useState } from "react";
-import { fetchDataFromApi } from "../utils/interceptor";
+import { useState, useEffect } from "react";
 
-const useFetch = (url: string) => {
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState<boolean | null | string>(null);
+type FetchFn<T> = () => Promise<T>;
+type UseFetchOptions<T> = {
+  onSuccess?: (data: T) => void;
+  onError?: (error: string) => void;
+};
+
+export default function useFetch<T>(
+  fetchFn: FetchFn<T>,
+  options?: UseFetchOptions<T>
+) {
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading("loading...");
-    setData(null);
-    setError(null);
+    let isMounted = true;
 
-    fetchDataFromApi(url)
-      .then(res => {
-        setLoading(false);
-        setData(res);
-      })
-      .catch(() => {
-        setLoading(false);
-        setError("Something went wrong!");
-      });
-  }, [url]);
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      setData(null);
+
+      try {
+        const res = await fetchFn();
+        if (isMounted) {
+          setData(res);
+          options?.onSuccess?.(res);
+        }
+      } catch (err) {
+        if (isMounted) {
+          const message = err?.response?.data?.message || err?.message || "Something went wrong!";
+          setError(message);
+          options?.onError?.(message);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [fetchFn]);
 
   return { data, loading, error };
-};
-
-export default useFetch;
+}

@@ -1,15 +1,20 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 
 import Carousel from "../../../components/carousel/Carousel";
 import ContentWrapper from "../../../components/contentWrapper/ContentWrapper";
 import SwitchTabs from "../../../components/switchTabs/SwitchTabs";
 
 import useFetch from "../../../hooks/useFetch";
+import apiService from "../../../services/apiService";
 
 const TopRated = () => {
     const [endpoint, setEndpoint] = useState("movie");
 
     const { data, loading } = useFetch(`/${endpoint}/top_rated`);
+
+    const trendingMovieFn = useCallback(() => apiService.getTrendingMovies(endpoint), [endpoint]);
+
+    const { data, loading } = useFetch(trendingMovieFn);
 
     const onTabChange = (tab) => {
         setEndpoint(tab === "Movies" ? "movie" : "tv");
