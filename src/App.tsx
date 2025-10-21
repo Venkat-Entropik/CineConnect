@@ -36,7 +36,7 @@ const App: FC = () => {
   }, []);
 
   const fetchApiConfig = () => {
-    fetchDataFromApi("/configuration").then((res) => {
+    fetchDataFromApi("/configuration").then(res => {
       const url: ApiConfig = {
         backdrop: res.images.secure_base_url + "original",
         poster: res.images.secure_base_url + "original",
@@ -52,7 +52,7 @@ const App: FC = () => {
     const endPoints: string[] = ["tv", "movie"];
     const allGenres: { [key: number]: Genre } = {};
 
-    endPoints.forEach((url) => {
+    endPoints.forEach(url => {
       promises.push(fetchDataFromApi(`/genre/${url}/list`));
     });
 
