@@ -1,7 +1,6 @@
 import React, { FC, useRef } from "react";
 import { BsFillArrowLeftCircleFill, BsFillArrowRightCircleFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
 
 import ContentWrapper from "../contentWrapper/ContentWrapper";
 import Img from "../lazyLoadImage/Img";
@@ -10,19 +9,20 @@ import CircleRating from "../circleRating/CircleRating";
 import Genres from "../genres/Genres";
 
 import "./style.scss";
-import { dataProps } from "../../types/data";
+import { dataProps } from "../../types/data.types";
 import { getDateFormat } from "../../utils/utilityService";
+import { useAppSelector } from "../../hooks/useAppSelector";
 
 interface CarouselProps {
   data: dataProps[];
-  loading: boolean;
+  loading: boolean | null;
   endpoint: string;
   title: string;
 }
 
 const Carousel: FC<CarouselProps> = ({ data, loading, endpoint, title }) => {
   const carouselContainer = useRef<HTMLDivElement>(null);
-  const { url } = useSelector(state => state.home);
+  const { url } = useAppSelector(state => state.home);
   const navigate = useNavigate();
 
   const navigation = (dir: string): void => {
@@ -68,7 +68,9 @@ const Carousel: FC<CarouselProps> = ({ data, loading, endpoint, title }) => {
         {!loading ? (
           <div className="carouselItems" ref={carouselContainer}>
             {data?.map(item => {
-              const posterUrl: string = item.poster_path ? url.poster + item.poster_path : PosterFallback;
+              const posterUrl: string = item.poster_path
+                ? url.poster + item.poster_path
+                : PosterFallback;
               return (
                 <div
                   key={item.id}

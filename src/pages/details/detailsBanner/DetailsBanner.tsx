@@ -1,31 +1,44 @@
-import React, { useState } from "react";
+import React, { FC, useCallback, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
 
 import "./style.scss";
 
-import ContentWrapper from "../../../components/contentWrapper/ContentWrapper";
-import useFetch from "../../../hooks/useFetch";
-import Genres from "../../../components/genres/Genres";
-import CircleRating from "../../../components/circleRating/CircleRating";
+import ContentWrapper from "../../../components/contentWrapper/ContentWrapper.tsx";
+import useFetch from "../../../hooks/useFetch.jsx";
+import Genres from "../../../components/genres/Genres.jsx";
+import CircleRating from "../../../components/circleRating/CircleRating.tsx";
 import Img from "../../../components/lazyLoadImage/Img.jsx";
 import PosterFallback from "../../../assets/no-poster.png";
-import { PlayIcon } from "../Playbtn";
-import VideoPopup from "../../../components/videoPopup/VideoPopup";
+import { PlayIcon } from "../Playbtn.jsx";
+import VideoPopup from "../../../components/videoPopup/VideoPopup.jsx";
 import { getDateFormat } from "../../../utils/utilityService.ts";
+import { useAppSelector } from "../../../hooks/useAppSelector.tsx";
+import {
+  crewTypes,
+  movieDetailsTypes,
+} from "../../../types/Explore.types.ts";
+import apiService from "../../../services/apiService.ts";
 
+interface DetailsBannerProps {
+  crew: crewTypes[];
+  video: movieDetailsTypes;
+}
 
-const DetailsBanner = ({ video, crew }) => {
-  console.log("video", video, crew)
+const DetailsBanner: FC<DetailsBannerProps> = ({ video, crew }) => {
+  console.log("video", video, crew);
   const [show, setShow] = useState(false);
   const [videoId, setVideoId] = useState(null);
 
   const { mediaType, id } = useParams();
-  const { data, loading } = useFetch(`/${mediaType}/${id}`);
+  const getMovieOrShowDetails = useCallback(()=>apiService.getMovieOrShowDetails(mediaType, id), [])
+  const { data, loading } = useFetch(getMovieOrShowDetails);
 
-  const { url } = useSelector(state => state.home);
+  const { url } = useAppSelector(state => state.home);
 
-  const _genres = data?.genres?.map(g => g.id);
+  const _genres = data?.data?.genres?.map(g => g.id);
+
+  console.log(_genres, "genres");
+  
 
   const director = crew?.filter(f => f.job === "Director");
   const writer = crew?.filter(
@@ -45,28 +58,28 @@ const DetailsBanner = ({ video, crew }) => {
           {!!data && (
             <React.Fragment>
               <div className="backdrop-img">
-                <Img src={url.backdrop + data.backdrop_path} />
+                <Img src={url.backdrop + data?.data?.backdrop_path} />
               </div>
               <div className="opacity-layer"></div>
               <ContentWrapper>
                 <div className="content">
                   <div className="left">
-                    {data.poster_path ? (
-                      <Img className="posterImg" src={url.backdrop + data.poster_path} />
+                    {data?.data?.poster_path ? (
+                      <Img className="posterImg" src={url.backdrop + data?.data?.poster_path} />
                     ) : (
                       <Img className="posterImg" src={PosterFallback} />
                     )}
                   </div>
                   <div className="right">
                     <div className="title">
-                      {`${data.name || data.title} (${getDateFormat(data.release_date, "YYYY")})`}
+                      {`${data?.data?.name || data?.data?.title} (${getDateFormat(data?.data?.release_date, "YYYY")})`}
                     </div>
-                    <div className="subtitle">{data.tagline}</div>
+                    <div className="subtitle">{data?.data?.tagline}</div>
 
                     <Genres data={_genres} />
 
                     <div className="row">
-                      <CircleRating rating={data.vote_average.toFixed(1)} />
+                      <CircleRating rating={data?.data?.vote_average.toFixed(1)} />
                       <div
                         className="playbtn"
                         onClick={() => {
@@ -81,28 +94,28 @@ const DetailsBanner = ({ video, crew }) => {
 
                     <div className="overview">
                       <div className="heading">Overview</div>
-                      <div className="description">{data.overview}</div>
+                      <div className="description">{data?.data?.overview}</div>
                     </div>
 
                     <div className="info">
-                      {data.status && (
+                      {data?.data?.status && (
                         <div className="infoItem">
                           <span className="text bold">Status: </span>
-                          <span className="text">{data.status}</span>
+                          <span className="text">{data?.data?.status}</span>
                         </div>
                       )}
-                      {data.release_date && (
+                      {data?.data?.release_date && (
                         <div className="infoItem">
                           <span className="text bold">Release Date: </span>
                           <span className="text">
-                            {getDateFormat(data.release_date, "MMM D, YYYY")}
+                            {getDateFormat(data?.data?.release_date, "MMM D, YYYY")}
                           </span>
                         </div>
                       )}
-                      {data.runtime && (
+                      {data?.data?.runtime && (
                         <div className="infoItem">
                           <span className="text bold">Runtime: </span>
-                          <span className="text">{toHoursAndMinutes(data.runtime)}</span>
+                          <span className="text">{toHoursAndMinutes(data?.data?.runtime)}</span>
                         </div>
                       )}
                     </div>
@@ -135,14 +148,14 @@ const DetailsBanner = ({ video, crew }) => {
                       </div>
                     )}
 
-                    {data?.created_by?.length > 0 && (
+                    {data?.data?.created_by?.length > 0 && (
                       <div className="info">
                         <span className="text bold">Creator: </span>
                         <span className="text">
-                          {data?.created_by?.map((d, i) => (
+                          {data?.data?.created_by?.map((d, i) => (
                             <span key={i}>
                               {d.name}
-                              {data?.created_by.length - 1 !== i && ", "}
+                              {data?.data?.created_by.length - 1 !== i && ", "}
                             </span>
                           ))}
                         </span>
