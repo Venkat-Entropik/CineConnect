@@ -30,7 +30,6 @@ interface RootState {
 const App: FC = () => {
   const dispatch = useDispatch();
   const { url } = useSelector((state: RootState) => state.home);
-  console.log(url);
 
   useEffect(() => {
     genresCall();
@@ -39,12 +38,16 @@ const App: FC = () => {
   const fetchConfig = useCallback(() => apiService.getConfigurations(), []);
   useFetch(fetchConfig, {
     onSuccess: res => {
+      
       const url = {
         backdrop: res.data.images.secure_base_url + "original",
         poster: res.data.images.secure_base_url + "original",
         profile: res.data.images.secure_base_url + "original",
       };
+      
       dispatch(getApiConfiguration(url));
+      console.log("url", url);
+      
     },
     onError: errMsg => {
       console.error("Config fetch failed:", errMsg);

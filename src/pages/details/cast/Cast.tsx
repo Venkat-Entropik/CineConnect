@@ -5,7 +5,7 @@ import "./style.scss";
 import ContentWrapper from "../../../components/contentWrapper/ContentWrapper";
 import Img from "../../../components/lazyLoadImage/Img";
 import avatar from "../../../assets/avatar.png";
-import { dataProps } from "../../../types/data";
+import { dataProps } from "../../../types/data.types";
 import { useAppSelector } from "../../../hooks/useAppSelector";
 
 interface CastProps {

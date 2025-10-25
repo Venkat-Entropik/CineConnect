@@ -17,7 +17,7 @@ import {
   genreProps,
   selectedSortByActionProps,
   sortByProps,
-} from "../../types/Explore";
+} from "../../types/Explore.types";
 import EmptyState from "../EmptyState/EmptyState";
 
 let filters = {};
@@ -41,7 +41,6 @@ const Explore = () => {
     });
   };
 
-  console.log("data", data, genre, sortby);
 
   const fetchNextPageData = (): void => {
     fetchDataFromApi(`/discover/${mediaType}?page=${pageNum}`, filters).then(res => {
@@ -67,7 +66,6 @@ const Explore = () => {
   }, [mediaType]);
 
   const onChange = (selectedItems: sortByProps, action: selectedSortByActionProps): void => {
-    console.log("selected", selectedItems, action);
     if (action.name === "sortby") {
       setSortby(selectedItems);
       if (action.action !== "clear") {

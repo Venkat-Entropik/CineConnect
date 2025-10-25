@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FC } from "react";
+import React, { useState, useEffect, FC, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "./style.scss";
 
@@ -7,17 +7,21 @@ import useFetch from "../../../hooks/useFetch";
 import Img from "../../../components/lazyLoadImage/Img";
 import ContentWrapper from "../../../components/contentWrapper/ContentWrapper";
 import { useAppSelector } from "../../../hooks/useAppSelector";
+import apiService from "../../../services/apiService";
 
 const HeroBanner: FC = () => {
   const [background, setBackground] = useState<string>("");
   const [query, setQuery] = useState<string>("");
   const navigate = useNavigate();
   const { url } = useAppSelector(state => state.home);
-  const { data, loading } = useFetch("/movie/upcoming");
+
+  const getUpComingMovies = useCallback(()=> apiService.getUpComingMovies(), [])
+
+  const { data, loading } = useFetch(getUpComingMovies);
 
   useEffect(() => {
     const bg: string =
-      url.backdrop + data?.results?.[Math.floor(Math.random() * 20)]?.backdrop_path;
+      url.backdrop + data?.data?.results?.[Math.floor(Math.random() * 20)]?.backdrop_path;
     setBackground(bg);
   }, [data]);
 
@@ -26,7 +30,7 @@ const HeroBanner: FC = () => {
       navigate(`/search/${query}`);
     }
   };
-
+  
   return (
     <div className="heroBanner" data-testid="heroBanner">
       {!loading && (

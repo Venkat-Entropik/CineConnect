@@ -7,7 +7,7 @@ import CircleRating from "../circleRating/CircleRating";
 import Genres from "../genres/Genres";
 import PosterFallback from "../../assets/no-poster.png";
 import { getDateFormat } from "../../utils/utilityService";
-import { dataProps } from "../../types/data";
+import { dataProps } from "../../types/data.types";
 import { useAppSelector } from "../../hooks/useAppSelector";
 
 interface MovieCardProps {
