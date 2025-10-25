@@ -1,10 +1,10 @@
 import React from "react";
-import { useSelector } from "react-redux";
 
 import "./style.scss";
+import { useAppSelector } from "../../hooks/useAppSelector";
 
 const Genres = ({ data }) => {
-    const { genres } = useSelector((state) => state.home);
+    const { genres } = useAppSelector((state) => state.home);
 
     return (
         <div className="genres">
