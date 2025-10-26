@@ -1,6 +1,5 @@
 import React, { useEffect, FC, useCallback } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { fetchDataFromApi } from "./utils/interceptor";
 import { useSelector, useDispatch } from "react-redux";
 import { getApiConfiguration, getGenres } from "./store/homeSlice";
 
@@ -38,16 +37,13 @@ const App: FC = () => {
   const fetchConfig = useCallback(() => apiService.getConfigurations(), []);
   useFetch(fetchConfig, {
     onSuccess: res => {
-      
       const url = {
         backdrop: res.data.images.secure_base_url + "original",
         poster: res.data.images.secure_base_url + "original",
         profile: res.data.images.secure_base_url + "original",
       };
-      
+
       dispatch(getApiConfiguration(url));
-      console.log("url", url);
-      
     },
     onError: errMsg => {
       console.error("Config fetch failed:", errMsg);
@@ -60,12 +56,13 @@ const App: FC = () => {
     const allGenres: { [key: number]: Genre } = {};
 
     endPoints.forEach(url => {
-      promises.push(fetchDataFromApi(`/genre/${url}/list`));
+      promises.push(apiService.getAllGenre(url));
     });
 
     const data = await Promise.all(promises);
-    data.map(({ genres }) => {
-      return genres.map((item: Genre) => (allGenres[item.id] = item));
+
+    data?.map(({ data }) => {
+      return data?.genres?.map((item: Genre) => (allGenres[item.id] = item));
     });
 
     dispatch(getGenres(allGenres));

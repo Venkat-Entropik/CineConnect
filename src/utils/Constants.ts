@@ -7,4 +7,8 @@ export const Constants = {
     GENRE: "genre",
     MOVIE_OR_SHOW_DETAILS: "videos",
     MOVIE_OR_SHOW_CREDITS: "credits",
+    SIMILAR_MOVIE_OR_SHOWS: "similar",
+    RECOMENDED_MOVIE_OR_SHOWS: "recommendations",
+    EXPLORE_MOVIES: "/discover",
+    SEARCH_MOVIES: "/search/multi",
 }

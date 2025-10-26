@@ -1,7 +1,8 @@
-import React, { FC } from "react";
+import React, { FC, useCallback } from "react";
 
 import Carousel from "../../../components/carousel/Carousel";
 import useFetch from "../../../hooks/useFetch";
+import apiService from "../../../services/apiService";
 
 interface RecommendationProps {
   mediaType: string;
@@ -9,10 +10,14 @@ interface RecommendationProps {
 }
 
 const Recommendation: FC<RecommendationProps> = ({ mediaType, id }) => {
-  const { data, loading } = useFetch(`/${mediaType}/${id}/recommendations`);
+  const getRecomendedMovieOrShow = useCallback(
+    () => apiService.getRecomendedMovieOrShows(mediaType, id),
+    [mediaType, id]
+  );
+  const { data, loading } = useFetch(getRecomendedMovieOrShow);
 
   return (
-    <Carousel title="Recommendations" data={data?.results} loading={loading} endpoint={mediaType} />
+    <Carousel title="Recommendations" data={data?.data?.results} loading={loading} endpoint={mediaType} />
   );
 };
 

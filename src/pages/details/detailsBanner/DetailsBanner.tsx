@@ -25,7 +25,6 @@ interface DetailsBannerProps {
 }
 
 const DetailsBanner: FC<DetailsBannerProps> = ({ video, crew }) => {
-  console.log("video", video, crew);
   const [show, setShow] = useState(false);
   const [videoId, setVideoId] = useState(null);
 
@@ -36,9 +35,6 @@ const DetailsBanner: FC<DetailsBannerProps> = ({ video, crew }) => {
   const { url } = useAppSelector(state => state.home);
 
   const _genres = data?.data?.genres?.map(g => g.id);
-
-  console.log(_genres, "genres");
-  
 
   const director = crew?.filter(f => f.job === "Director");
   const writer = crew?.filter(

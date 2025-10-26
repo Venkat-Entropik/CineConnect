@@ -5,22 +5,23 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import "./style.scss";
 
 import useFetch from "../../hooks/useFetch";
-import { fetchDataFromApi } from "../../utils/interceptor";
+import { sortbyData } from "../../utils/Static";
+import Dropdown from "../../design/Atoms/Dropdown/Dropdown";
 import ContentWrapper from "../../components/contentWrapper/ContentWrapper";
 import MovieCard from "../../components/movieCard/MovieCard";
 import Spinner from "../../components/spinner/Spinner";
+import EmptyState from "../EmptyState/EmptyState";
+import apiService from "../../services/apiService";
 
-import { sortbyData } from "../../utils/Static";
-import Dropdown from "../../design/Atoms/Dropdown/Dropdown";
 import {
   ExploreDataProps,
   genreProps,
   selectedSortByActionProps,
   sortByProps,
 } from "../../types/Explore.types";
-import EmptyState from "../EmptyState/EmptyState";
+import { useAppSelector } from "../../hooks/useAppSelector";
 
-let filters = {};
+let filters: any = {};
 
 const Explore = () => {
   const [data, setData] = useState<ExploreDataProps | null>(null);
@@ -29,30 +30,29 @@ const Explore = () => {
   const [genre, setGenre] = useState<genreProps[] | null>(null);
   const [sortby, setSortby] = useState<sortByProps | null>(null);
   const { mediaType } = useParams();
-
-  const { data: genresData } = useFetch(`/genre/${mediaType}/list`);
+  const { genres } = useAppSelector((state) => state.home);
 
   const fetchInitialData = (): void => {
     setLoading(true);
-    fetchDataFromApi(`/discover/${mediaType}`, filters).then(res => {
-      setData(res);
-      setPageNum(prev => prev + 1);
+    apiService.getExploreAllMovies(mediaType, 1, filters).then((res) => {
+      setData(res?.data); // store full response
+      setPageNum(2); // next page to fetch
       setLoading(false);
     });
   };
 
-
   const fetchNextPageData = (): void => {
-    fetchDataFromApi(`/discover/${mediaType}?page=${pageNum}`, filters).then(res => {
-      if (data && data.results) {
-        setData({
-          ...data,
-          results: [...data.results, ...res.results],
+    apiService.getExploreAllMovies(mediaType, pageNum, filters).then((res) => {
+      if (res?.data?.results?.length) {
+        setData((prevData) => {
+          if (!prevData) return res.data;
+          return {
+            ...res.data,
+            results: [...prevData.results, ...res.data.results],
+          };
         });
-      } else {
-        setData(res);
+        setPageNum((prev) => prev + 1);
       }
-      setPageNum(prev => prev + 1);
     });
   };
 
@@ -65,7 +65,7 @@ const Explore = () => {
     fetchInitialData();
   }, [mediaType]);
 
-  const onChange = (selectedItems: sortByProps, action: selectedSortByActionProps): void => {
+  const onChange = (selectedItems: any, action: selectedSortByActionProps): void => {
     if (action.name === "sortby") {
       setSortby(selectedItems);
       if (action.action !== "clear") {
@@ -78,8 +78,7 @@ const Explore = () => {
     if (action.name === "genres") {
       setGenre(selectedItems);
       if (action.action !== "clear") {
-        let genreId = selectedItems.map(g => g.id);
-        genreId = JSON.stringify(genreId).slice(1, -1);
+        const genreId = selectedItems.map((g: any) => g.id).join(",");
         filters.with_genres = genreId;
       } else {
         delete filters.with_genres;
@@ -97,20 +96,24 @@ const Explore = () => {
           <div className="pageTitle">
             {mediaType === "tv" ? "Explore TV Shows" : "Explore Movies"}
           </div>
+
           <div className="filters">
+            {/* Genre filter */}
             <Dropdown
               isMulti
               name="genres"
               value={genre}
               closeMenuOnSelect={false}
-              options={genresData?.genres}
-              getOptionLabel={option => option.name}
-              getOptionValue={option => option.id}
+              options={[...Object.values(genres)]}
+              getOptionLabel={(option) => option.name}
+              getOptionValue={(option) => option.id}
               onChange={onChange}
               placeholder="Select genres"
               className="react-select-container genresDD"
               classNamePrefix="react-select"
             />
+
+            {/* Sort filter */}
             <Dropdown
               name="sortby"
               value={sortby}
@@ -123,19 +126,23 @@ const Explore = () => {
             />
           </div>
         </div>
+
+        {/* Spinner for first load */}
         {loading && <Spinner initial={true} />}
+
+        {/* Results */}
         {!loading && (
           <>
             {data?.results?.length > 0 ? (
               <InfiniteScroll
                 className="content"
-                dataLength={data?.results?.length || []}
+                dataLength={data?.results?.length || 0}
                 next={fetchNextPageData}
                 hasMore={pageNum <= data?.total_pages}
                 loader={<Spinner />}
               >
-                {data?.results?.map((item, index) => {
-                  if (item.media_type === "person") return;
+                {data.results.map((item, index) => {
+                  if (item.media_type === "person") return null;
                   return <MovieCard key={index} data={item} mediaType={mediaType} />;
                 })}
               </InfiniteScroll>

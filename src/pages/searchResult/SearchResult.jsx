@@ -4,11 +4,11 @@ import InfiniteScroll from "react-infinite-scroll-component";
 
 import "./style.scss";
 
-import { fetchDataFromApi } from "../../utils/interceptor";
 import ContentWrapper from "../../components/contentWrapper/ContentWrapper";
 import MovieCard from "../../components/movieCard/MovieCard";
 import Spinner from "../../components/spinner/Spinner";
 import EmptyState from "../EmptyState/EmptyState";
+import apiService from "../../services/apiService";
 
 const SearchResult = () => {
   const [data, setData] = useState(null);
@@ -18,24 +18,25 @@ const SearchResult = () => {
 
   const fetchInitialData = () => {
     setLoading(true);
-    fetchDataFromApi(`/search/multi?query=${query}&page=${pageNum}`).then(res => {
-      setData(res);
-      setPageNum(prev => prev + 1);
+    apiService.searchMoviesOrShows(query, pageNum).then(res => {
+      setData(res?.data); // store full response
+      setPageNum(2); // next page to fetch
       setLoading(false);
     });
   };
 
   const fetchNextPageData = () => {
-    fetchDataFromApi(`/search/multi?query=${query}&page=${pageNum}`).then(res => {
-      if (data?.results) {
-        setData({
-          ...data,
-          results: [...data?.results, ...res.results],
+    apiService.searchMoviesOrShows(query, pageNum).then(res => {
+      if (res?.data?.results?.length) {
+        setData((prevData) => {
+          if (!prevData) return res.data;
+          return {
+            ...res.data,
+            results: [...prevData.results, ...res.data.results],
+          };
         });
-      } else {
-        setData(res);
+        setPageNum((prev) => prev + 1);
       }
-      setPageNum(prev => prev + 1);
     });
   };
 
